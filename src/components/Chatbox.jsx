@@ -1,9 +1,49 @@
-import React, { useState } from "react";
 import logo from '../assets/logohvs.webp';
+import React, { useEffect, useRef, useState } from "react";
 
-function Chatbox () {
-  const [messages, setMessages] = useState([]);
+function Chatbox() {
+  const [messages, setMessages] = useState([
+    { sender: "bot", text: "Posso Ajudar?" },
+  ]);
   const [userInput, setUserInput] = useState("");
+  const [messageToWpp, setMessageToWpp] = useState("");
+
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    // Scroll to the bottom of the messages container
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]); // This effect runs when messages change
+
+
+  const copyMessage = (copyMessageText) => {
+    navigator.clipboard.writeText(copyMessageText)
+      .then(() => {
+        setMessageToWpp(copyMessageText); // Atualiza a mensagem para enviar ao WhatsApp
+      })
+      .catch(err => {
+        console.error('Falha ao copiar: ', err);
+      })
+      .finally(() => {
+        handleSendMessage(copyMessageText); // Passa o texto copiado para o envio
+      });
+  }
+  
+  const handleSendMessage = (messageToWpp) => {
+    if (!messageToWpp) {
+      console.error('Mensagem não definida');
+      return;
+    }
+
+    const phoneNumber = '44998484800'; // Número de telefone no formato internacional
+    const text = encodeURIComponent(messageToWpp); // Codifica a mensagem para URL
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${text}`;
+
+    window.open(whatsappURL, '_blank'); // Abre o link do WhatsApp com a mensagem
+  };
+
 
   const sendMessage = async () => {
     if (userInput.trim() === "") return;
@@ -15,10 +55,10 @@ function Chatbox () {
     try {
       const systemMessage = {
         role: 'system',
-        content:`
+        content: `
         Você é como um funcionário do meu e-commerce que vende produtos de saúde para clínicas, vou inserir neste texto alguns produtos
                 que tenho em estoque e preciso que você fale sobre os produtos caso o cliente pergunte sobre algum deles e ajude-o a encontrar o produto.
-               Os produtos no estoque da nossa loja são em BRL real.
+               Todos produtos sao na moeda real.
                os produtos com quantiade com "g" ou "gr" em frente a um numero, signficam o peso em grama, nao é necessario exibir as contas dos produtos, apenas o resultado do calculo.
                Quando solicitado um orcamento informar o valor dos produtos solicitados, e mencionar o estoque apenas se faltar;
                Caso o produto solicitado pelo cliente nao tenha estoque disponível, avisa-lo que nao ha estoque no momento o estoque sigfnica o "S" nos objetos do JSON;
@@ -1206,13 +1246,13 @@ function Chatbox () {
                 "S": 139,
                 "Vlr": 4.90
               }
-            ],"papel toalha":
-                {
-                  "P": "PAPEL TOALHA C/1000 BRANCO - ",
-                  "V": "null",
-                  "S": 32,
-                  "Vlr": 18.69
-                }
+            ], "papel toalha":
+            {
+              "P": "PAPEL TOALHA C/1000 BRANCO - ",
+              "V": "null",
+              "S": 32,
+              "Vlr": 18.69
+            }
             ,
             "seringa":
               [
@@ -1251,7 +1291,7 @@ function Chatbox () {
         })),
       ];
 
-      const response = await fetch('https://my-chat-api-af131ed6ad57.herokuapp.com/api/chat', { 
+      const response = await fetch('https://my-chat-api-af131ed6ad57.herokuapp.com/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1282,10 +1322,7 @@ function Chatbox () {
     }
   };
 
-  const copyMessage = (messageText) => {
-    // Implement copy message logic for WhatsApp or other platforms
-    console.log(`Copying message: ${messageText}`);
-  };
+
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gradient-to-b from-gray-200">
@@ -1309,22 +1346,25 @@ function Chatbox () {
               className={`mb-4 ${msg.sender === "bot" ? "text-left" : "text-right"}`}
             >
               <div
-                className={`inline-block p-3 rounded-lg ${msg.sender === "bot" ? "bg-white text-red-400" : "bg-gray-100 text-blue-500"}`}
+                className={`inline-block p-2 rounded-lg ${msg.sender === "bot" ? "bg-white text-red-400 border-[0.4px] border-zinc-200" : "bg-gray-200 text-blue-500 border-[0.4px] border-zinc-200"}`}
               >
                 {msg.text}
               </div>
-              {msg.sender === "bot" && (
-                <div className="flex mt-2 justify-end">
+               <div className="flex mt-1">
+                {msg.sender === "user" ? null
+                  :
                   <button
                     onClick={() => copyMessage(msg.text)}
-                    className="bg-transparent text-sm font-thin text-zinc-800 hover:underline"
+                    className="bg text-sm font-thin"
                   >
-                    Enviar Para WhatsApp
+                    Enviar para WhatsApp da loja
                   </button>
-                </div>
-              )}
+                }
+
+              </div>
             </div>
           ))}
+         <div ref={messagesEndRef} />
         </div>
 
         {/* Input Field and Send Button */}
@@ -1342,7 +1382,7 @@ function Chatbox () {
             }}
           />
           <button onClick={sendMessage}>
-            <div className="bg-red-600 self-center px-4 py-3.5 text-center text-white font-semibold text-md rounded-lg shadow-sm hover:bg-red-700">
+            <div className="bg-zinc-800 self-center px-4 py-3.5 text-center text-white font-semibold text-md rounded-lg shadow-sm hover:bg-red-600">
               Enviar
             </div>
           </button>

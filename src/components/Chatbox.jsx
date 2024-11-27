@@ -1382,7 +1382,7 @@ function Chatbox() {
             }}
           />
           <button onClick={sendMessage}>
-            <div className="bg-zinc-800 self-center px-4 py-3.5 text-center text-white font-semibold text-md rounded-lg shadow-sm hover:bg-red-600">
+            <div className="bg-zinc-800 self-center px-4 py-3.5 text-center text-white font-semibold text-md rounded-lg shadow-sm hover:bg-red-500">
               Enviar
             </div>
           </button>

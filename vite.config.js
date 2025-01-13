@@ -8,5 +8,4 @@ export default defineConfig({
       plugins: [tailwindcss()],
     },
   },
-  base: '/hvschat.github.io'
 });

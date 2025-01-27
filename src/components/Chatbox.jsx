@@ -6,14 +6,67 @@ function Chatbox() {
   const [userInput, setUserInput] = useState("");
   const [messageToWpp, setMessageToWpp] = useState("");
   const [cart, setCart] = useState([]); // State to store the cart items
+  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
+  const [selectedProduct, setSelectedProduct] = useState(null); // Track selected product
+  const [quantity, setQuantity] = useState(1); // Track quantity selection
 
-  const addToCart = (product) => {
-    setCart(prevCart => [...prevCart, product]); // Add the product to the cart
+  const handleFinalizePurchase = () => {
+    // Construct the message to send to WhatsApp
+    const cartMessage = cart.map((product) => {
+      return `${product.nome} (x${product.quantity}) - R$ ${product.preco}`;
+    }).join("\n");
+  
+    const totalMessage = `Total: R$ ${calculateTotal()}`;
+  
+    // Prepare the complete message
+    const completeMessage = `Itens no carrinho:\n${cartMessage}\n\n${totalMessage}`;
+  
+    // Use the copyMessage function to send the message
+    copyMessage(completeMessage);
+    console.log(completeMessage)
+
+  };
+
+  
+  const addToCart = (product, qty) => {
+    const updatedCart = [...cart];
+    const existingProduct = updatedCart.find((item) => item._id === product._id);
+
+    if (existingProduct) {
+      existingProduct.quantity += qty; // Increase quantity if product already in cart
+    } else {
+      updatedCart.push({ ...product, quantity: qty });
+    }
+
+    setCart(updatedCart); // Update the cart state
   };
 
   const handleProductClick = (product) => {
-    addToCart(product);
-    console.log(cart); // Optionally log the cart to see its contents
+    setSelectedProduct(product);
+    setIsModalOpen(true); // Open modal to select quantity
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // Close modal
+  }
+
+  const handleQuantityChange = (action) => {
+    setQuantity(prevQuantity => {
+      if (action === 'increase') {
+        return prevQuantity + 1;
+      } else if (action === 'decrease' && prevQuantity > 1) {
+        return prevQuantity - 1;
+      }
+      return prevQuantity;
+    });
+  };
+
+  const handleAddToCart = () => {
+    if (selectedProduct) {
+      addToCart(selectedProduct, quantity); // Add selected quantity to the cart
+      setIsModalOpen(false); // Close modal after adding to cart
+      setQuantity(1); // Reset quantity to 1
+    }
   };
 
   const messagesEndRef = useRef(null);
@@ -69,7 +122,7 @@ function Chatbox() {
       }));
 
       // Encoding user input for the API request
-      const apiMessagesString = encodeURIComponent(userInput);
+      const apiMessagesString = encodeURIComponent(userInput.toLocaleLowerCase());
 
       const response = await fetch(`http://localhost:5008/product?search=${apiMessagesString}`, {
         method: 'GET',
@@ -81,149 +134,204 @@ function Chatbox() {
       const data = await response.json();
       if (response.ok) {
         const products = data.data.products;
-        const gptResponse = data.data.gptResponse;
 
-        // Format product list with clickable items
-        const formattedProducts = products.map(product => (
-          <div
-            key={product._id}
-            onClick={() => handleProductClick(product)}
-            style={{ cursor: 'pointer', color: 'blue' }}
-          >
-            {product.name} ({product.category}) - R$ {product.price}
-          </div>
-        ));
+        const gptResponse = data.data.gptResponse.mensagem || data.data.gptResponse.message || data.data.gptResponse.resposta
 
-        // Format GPT insights
-        const formattedGPTResponse = (
+        const responseToNotFound = (
           <div>
-            <h4>GPT Insights:</h4>
-            <pre>{JSON.stringify(gptResponse, null, 2)}</pre>
+            <pre>{gptResponse}</pre>
           </div>
         );
 
-        // Store the messages with formatted content
-        setMessages([
-          ...newMessages,
-          {
-            sender: "bot",
-            text: (
-              <div>
-                <div>{formattedProducts}</div>
-                <div>{formattedGPTResponse}</div>
-              </div>
-            ), // Use JSX elements instead of strings
-          },
-        ]);
+
+        // Check if the products array is empty
+        if (products.length === 0) {
+          // If no products found, send a message
+          setMessages([
+            ...newMessages,
+            { sender: "bot", text: responseToNotFound },
+          ]);
+        } else {
+          // Format product list with clickable items
+          const formattedProducts = products.map(product => (
+            <div
+              key={product._id}
+              onClick={() => handleProductClick(product)}
+              style={{ cursor: 'pointer', color: 'red' }}
+            >
+              {product.nome} ({product.categoria}) - R$ {product.preco}
+            </div>
+          ));
+
+          // Store the messages with formatted content
+          setMessages([
+            ...newMessages,
+            {
+              sender: "bot",
+              text: (
+                <div>
+                  <div>{formattedProducts || responseToNotFound}</div>
+
+                </div>
+              ), // Use JSX elements instead of strings
+            },
+          ]);
+        }
       } else {
         console.error('Error:', data.error || 'Unknown error');
         setMessages([
           ...newMessages,
-          { sender: "bot", text: "Desculpe, ocorreu um erro. Tente novamente." },
+          { sender: "bot", text: "00 Desculpe, ocorreu um erro. Tente novamente." },
         ]);
       }
     } catch (error) {
       console.error('Erro:', error);
       setMessages([
         ...newMessages,
-        { sender: "bot", text: "Desculpe, ocorreu um erro. Tente novamente." },
+        { sender: "bot", text: "01 Desculpe, ocorreu um erro. Tente novamente." },
       ]);
     }
+
   };
 
+  const calculateTotal = () => {
+    return cart.reduce((total, product) => total + parseFloat(product.preco), 0).toFixed(2);
+  };
 
   return (
     <>
-    <div className='flex flex-row justify-between mt-28'>
-
-   
-      <div className="flex-row justify-between bg-gradient-to-b from-gray-200 ml-9">
-        <div className="bg-white p-5 w-full sm:w-[640px] h-[33em] rounded-lg shadow-lg">
-          <div className="flex flex-row-reverse justify-between mb-10">
-            <div>
-              <h1 className="text-3xl font-bold text-center text-red-400">
-                Atendente virtual
-              </h1>
+      <div className='flex flex-row justify-between mt-28'>
+        {/* Chat UI and messages (unchanged) */}
+        <div className="flex-row justify-between bg-gradient-to-b from-gray-200 ml-9">
+          <div className="bg-white p-5 w-[60em] h-[33em] rounded-lg shadow-lg">
+            <div className="flex flex-row-reverse justify-between mb-10">
+              <div>
+                <h1 className="text-3xl font-bold text-center text-red-400">
+                  Atendente virtual
+                </h1>
+              </div>
+              <div className="w-40">
+                <img src={logo} alt="HVS" />
+              </div>
             </div>
-            <div className="w-40">
-              <img src={logo} alt="HVS" />
-            </div>
-          </div>
 
-          {/* Chat History */}
-          <div className="bg-gradient-to-b from-gray-100 border-[0.4px] border-zinc-300 shadow-sm p-4 h-[20em] rounded-lg overflow-y-auto mb-5">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`mb-4 ${msg.sender === "bot" ? "text-left" : "text-right"}`}
-              >
+            {/* Chat History */}
+            <div className="bg-gradient-to-b from-gray-100 border-[0.4px] border-zinc-300 shadow-sm p-4 h-[20em] rounded-lg overflow-y-auto mb-5">
+              {messages.map((msg, index) => (
                 <div
-                  className={`inline-block p-2 rounded-lg ${msg.sender === "bot" ? "bg-white text-red-400 border-[0.4px] border-zinc-200" : "bg-gray-200 text-blue-500 border-[0.4px] border-zinc-200"}`}
+                  key={index}
+                  className={`mb-4 ${msg.sender === "bot" ? "text-left" : "text-right"}`}
                 >
-                  {msg.text}
+                  <div
+                    className={`inline-block p-2 rounded-lg ${msg.sender === "bot" ? "bg-white text-red-400 border-[0.4px] border-zinc-200" : "bg-gray-200 text-blue-500 border-[0.4px] border-zinc-200"}`}
+                  >
+                    {msg.text}
+                  </div>
+                  <div className="flex mt-1">
+                    {msg.sender === "user" ? null : (
+                      <button
+                        onClick={() => copyMessage(msg.text)}
+                        className="bg text-sm font-thin"
+                      >
+                        Enviar para WhatsApp da loja
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex mt-1">
-                  {msg.sender === "user" ? null : (
-                    <button
-                      onClick={() => copyMessage(msg.text)}
-                      className="bg text-sm font-thin"
-                    >
-                      Enviar para WhatsApp da loja
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
 
-          {/* Input Field and Send Button */}
-          <div className="flex justify-around mt-5">
-            <input
-              type="text"
-              className="w-full px-3 py-3.5 bg-gray-50 shadow-md border-[0.4px] border-zinc-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
-              placeholder="Digite sua mensagem..."
-              value={userInput.toLowerCase()}
-              onChange={(e) => setUserInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  sendMessage();
-                }
-              }}
-            />
-            <button onClick={sendMessage}>
-              <div className="bg-zinc-800 self-center px-4 py-3.5 text-center text-white font-semibold text-md rounded-lg shadow-sm hover:bg-red-500">
-                Enviar
-              </div>
+            {/* Input Field and Send Button */}
+            <div className="flex justify-around mt-5">
+              <input
+                type="text"
+                className="w-full px-3 py-3.5 bg-gray-50 shadow-md border-[0.4px] border-zinc-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
+                placeholder="Digite sua mensagem..."
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    sendMessage();
+                  }
+                }}
+              />
+              <button onClick={sendMessage}>
+                <div className="bg-zinc-800 self-center px-4 py-3.5 text-center text-white font-semibold text-md rounded-lg shadow-sm hover:bg-red-500">
+                  Enviar
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Shopping Cart (fixed on the right side) */}
+        <div
+          className=" bg-white p-3 rounded-lg shadow-lg w-96 h-[420px] overflow-y-auto mr-9"
+          style={{ zIndex: 100 }}
+        >
+          <h3 className="text-xl font-semibold text-red-400 mb-4">Carrinho de compras</h3>
+          <ul className="space-y-2">
+            {cart.map((product, index) => (
+              <li key={index} className="flex justify-between items-center border-b pb-2">
+                <span className="text-sm">{product.nome} (x{product.quantity})</span>
+                <span className="text-sm text-gray-600">R$ {product.preco}</span>
+              </li>
+            ))}
+          </ul>
+          {cart.length === 0 && (
+            <p className="text-sm text-gray-500 mt-4">Seu carrinho está vazio.</p>
+          )}
+          {/* Display Total */}
+          {cart.length > 0 && (
+            <div className="mt-4">
+              <p className="text-lg font-semibold">
+                Total: R$ {calculateTotal()}
+              </p>
+            </div>
+          )}
+          <div className="mt-4 flex">
+            <button 
+                onClick={handleFinalizePurchase}
+                className="bg-red-400 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-500">
+              Finalizar Compra
             </button>
           </div>
         </div>
       </div>
 
-      {/* Shopping Cart (fixed on the right side) */}
-      <div
-        className=" bg-white p-3 rounded-lg shadow-lg w-96 h-[350px] overflow-y-auto mr-9"
-        style={{ zIndex: 100 }}
-      >
-        <h3 className="text-xl font-semibold text-red-400 mb-4">Carrinho de compras</h3>
-        <ul className="space-y-2">
-          {cart.map((product, index) => (
-            <li key={index} className="flex justify-between items-center border-b pb-2">
-              <span className="text-sm">{product.name}</span>
-              <span className="text-sm text-gray-600">R$ {product.price}</span>
-            </li>
-          ))}
-        </ul>
-        {cart.length === 0 && (
-          <p className="text-sm text-gray-500 mt-4">Seu carrinho está vazio.</p>
-        )}
-        <div className="mt-4 flex">
-          <button className="bg-red-400 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-500">
-            Finalizar Compra
-          </button>
+      {/* Modal for selecting quantity */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h3 className="text-xl text-red-400 mb-4">Escolha a quantidade</h3>
+            <div>{selectedProduct.nome}</div>
+            <div className="flex justify-between items-center mb-4">
+              <button onClick={() => handleQuantityChange('decrease')} className="px-4 py-2 bg-red-400 text-white rounded-lg">-</button>
+              <input 
+                type="number" 
+                value={quantity} 
+                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)} 
+                min="1"
+                className="w-12 text-center"
+              />
+              <button onClick={() => handleQuantityChange('increase')} className="px-4 py-2 bg-red-400 text-white rounded-lg">+</button>
+            </div>
+            <button 
+              onClick={handleAddToCart} 
+              className="w-full px-4 py-2 bg-red-400 text-white rounded-lg shadow-md hover:bg-red-500"
+            >
+              Adicionar ao carrinho
+            </button>
+            <button 
+              onClick={handleCloseModal} 
+              className="w-full mt-2 px-4 py-2 bg-gray-400 text-white rounded-lg"
+            >
+              Fechar
+            </button>
+          </div>
         </div>
-      </div>
-      </div>
+      )}
     </>
   );
 }

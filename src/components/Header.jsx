@@ -5,7 +5,7 @@ import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 
 const Header = () => {
     return (
-        <div className="w-full bg-zinc-100 shadow-xl top-0 sticky">
+        <div className="w-full bg-zinc-100 shadow-md top-0 sticky">
             <div className="flex flex-row justify-between ml-5 mr-6 pt-5 pb-2">
                 <div className="w-28">
                     <img src={logo} alt="HVS" />

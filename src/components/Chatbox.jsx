@@ -15,19 +15,19 @@ function Chatbox() {
     const cartMessage = cart.map((product) => {
       return `${product.nome} (x${product.quantity}) - R$ ${product.preco}`;
     }).join("\n");
-  
+
     const totalMessage = `Total: R$ ${calculateTotal()}`;
-  
+
     // Prepare the complete message
     const completeMessage = `Itens no carrinho:\n${cartMessage}\n\n${totalMessage}`;
-  
+
     // Use the copyMessage function to send the message
     copyMessage(completeMessage);
     console.log(completeMessage)
 
   };
 
-  
+
   const addToCart = (product, qty) => {
     const updatedCart = [...cart];
     const existingProduct = updatedCart.find((item) => item._id === product._id);
@@ -135,11 +135,17 @@ function Chatbox() {
       if (response.ok) {
         const products = data.data.products;
 
-        const gptResponse = data.data.gptResponse.mensagem || data.data.gptResponse.message || data.data.gptResponse.resposta
+        const gptResponse = data.data.gptResponse
+        const gptResponseToUser = Object.keys(gptResponse);
 
-        const responseToNotFound = (
+        // Access the first field by position (index 0)
+        const gptResponseMessageToUser = gptResponse[gptResponseToUser[0]];  // In this case, "mensagem"
+        console.log(gptResponseMessageToUser)
+
+
+        const responseNotFoundProducts = (
           <div>
-            <pre>{gptResponse}</pre>
+            <pre>{gptResponseMessageToUser}</pre>
           </div>
         );
 
@@ -149,7 +155,7 @@ function Chatbox() {
           // If no products found, send a message
           setMessages([
             ...newMessages,
-            { sender: "bot", text: responseToNotFound },
+            { sender: "bot", text: responseNotFoundProducts },
           ]);
         } else {
           // Format product list with clickable items
@@ -170,7 +176,7 @@ function Chatbox() {
               sender: "bot",
               text: (
                 <div>
-                  <div>{formattedProducts || responseToNotFound}</div>
+                  <div>{formattedProducts || responseNotFoundProducts}</div>
 
                 </div>
               ), // Use JSX elements instead of strings
@@ -291,9 +297,9 @@ function Chatbox() {
             </div>
           )}
           <div className="mt-4 flex">
-            <button 
-                onClick={handleFinalizePurchase}
-                className="bg-red-400 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-500">
+            <button
+              onClick={handleFinalizePurchase}
+              className="bg-red-400 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-500">
               Finalizar Compra
             </button>
           </div>
@@ -308,23 +314,23 @@ function Chatbox() {
             <div>{selectedProduct.nome}</div>
             <div className="flex justify-between items-center mb-4">
               <button onClick={() => handleQuantityChange('decrease')} className="px-4 py-2 bg-red-400 text-white rounded-lg">-</button>
-              <input 
-                type="number" 
-                value={quantity} 
-                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)} 
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
                 min="1"
                 className="w-12 text-center"
               />
               <button onClick={() => handleQuantityChange('increase')} className="px-4 py-2 bg-red-400 text-white rounded-lg">+</button>
             </div>
-            <button 
-              onClick={handleAddToCart} 
+            <button
+              onClick={handleAddToCart}
               className="w-full px-4 py-2 bg-red-400 text-white rounded-lg shadow-md hover:bg-red-500"
             >
               Adicionar ao carrinho
             </button>
-            <button 
-              onClick={handleCloseModal} 
+            <button
+              onClick={handleCloseModal}
               className="w-full mt-2 px-4 py-2 bg-gray-400 text-white rounded-lg"
             >
               Fechar

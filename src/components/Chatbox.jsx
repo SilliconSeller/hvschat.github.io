@@ -207,14 +207,14 @@ function Chatbox() {
         console.error('Error:', data.error || 'Unknown error');
         setMessages([
           ...newMessages,
-          { sender: "bot", text: "03 Desculpe, ocorreu um erro no servidor" },
+          { sender: "bot", text: "01new Desculpe, ocorreu um erro no servidor" },
         ]);
       }
     } catch (error) {
       console.error('Erro:', error);
       setMessages([
         ...newMessages,
-        { sender: "bot", text: "01 Desculpe, ocorreu um erro. Tente novamente." },
+        { sender: "bot", text: "02new Desculpe, ocorreu um erro. Tente novamente." },
       ]);
     }
 

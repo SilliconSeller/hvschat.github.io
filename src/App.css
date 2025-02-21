@@ -18,6 +18,33 @@
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+@keyframes bounce200 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes bounce400 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+.animate-bounce200 {
+  animation: bounce200 0.2s infinite;
+}
+
+.animate-bounce400 {
+  animation: bounce400 0.2s infinite;
+}
+
+
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);

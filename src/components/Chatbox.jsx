@@ -4,7 +4,9 @@ import ProdutoHandler from '../models/produtoHandler';
 import ProductCard from './ProductCard';
 import Modal from './Modal'
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import Cart from './Cart'
+import Cart, { ShowCartPopup } from './Cart'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 
 function Chatbox() {
   const [messages, setMessages] = useState([]);
@@ -15,8 +17,12 @@ function Chatbox() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [unQuantity, setUnQuantity] = useState(0);
   const [boxQuantity, setBoxQuantity] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
- {/* const productTest = [
+
+  {/* const productTest = [
     {
       nome: "SERINGA 20G MEDIX L LOCK",
       unQuantity: 3,
@@ -39,8 +45,10 @@ function Chatbox() {
     }
   ];
   */}
+  const toggleCartShow = () => {
+    setIsCartOpen(prevState => !prevState); // Alterna entre true e false
+  };
   
-
   const handleFinalizePurchase = () => {
     const cartMessage = cart.map((product) => {
       return `${product.nome} (x${product.quantity}) - R$ ${product.preco}`;
@@ -49,7 +57,7 @@ function Chatbox() {
     const completeMessage = `Itens no carrinho:\n${cartMessage}\n\n${totalMessage}`;
     copyMessage(completeMessage);
   };
-  
+
   const addToCart = (product, qty, qtyBox) => {
     const updatedCart = [...cart];
     const existingProduct = updatedCart.find((item) => item._id === product._id);
@@ -160,6 +168,7 @@ function Chatbox() {
     const newMessages = [...messages, { sender: "user", text: userInput }];
     setMessages(newMessages);
     setUserInput("");
+    setIsLoading(true); // Set loading to true when the user sends a message
 
     try {
       const apiMessagesString = encodeURIComponent(userInput.toLocaleLowerCase());
@@ -173,29 +182,29 @@ function Chatbox() {
 
       const data = await response.json();
       if (response.ok) {
-
-        const handler = new ProdutoHandler(data)
-        const result = await handler.getProductsAndMessage()
-        const products = await result.products
-        const gptResponseMessageToUser = await result.gptResponseMessageToUser
-        const responseNotFoundProducts = gptResponseMessageToUser
+        const handler = new ProdutoHandler(data);
+        const result = await handler.getProductsAndMessage();
+        const products = await result.products;
+        const gptResponseMessageToUser = await result.gptResponseMessageToUser;
 
         if (products.length === 0) {
+          setIsLoading(false); // Hide the loading spinner
           setMessages([
             ...newMessages,
-            { sender: "bot", text: responseNotFoundProducts },
+            { sender: "bot", text: gptResponseMessageToUser },
           ]);
         } else {
           const formattedProducts = products.map((product) => (
             <ProductCard key={product._id} product={product} handleProductClick={handleProductClick} />
-          ))
+          ));
+          setIsLoading(false); // Hide the loading spinner
           setMessages([
             ...newMessages,
             {
               sender: "bot",
               text: (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-1">
                     {formattedProducts}
                   </div>
                 </div>
@@ -207,105 +216,116 @@ function Chatbox() {
         console.error('Error:', data.error || 'Unknown error');
         setMessages([
           ...newMessages,
-          { sender: "bot", text: "01new Desculpe, ocorreu um erro no servidor" },
+          { sender: "bot", text: "Desculpe, ocorreu um erro no servidor" },
         ]);
+        setIsLoading(false); // Hide the loading spinner on error
       }
     } catch (error) {
       console.error('Erro:', error);
       setMessages([
         ...newMessages,
-        { sender: "bot", text: "02new Desculpe, ocorreu um erro. Tente novamente." },
+        { sender: "bot", text: "Desculpe, ocorreu um erro. Tente novamente." },
       ]);
+      setIsLoading(false); // Hide the loading spinner on error
     }
-
   };
+
   const calculateTotal = () => {
     return cart.reduce((total, item) => {
       const unQuantityTotal = item.unQuantity > 0
         ? item.unQuantity * parseFloat(item.quantidades[0].valorUn)
         : 0;
-  
+
       const boxQuantityTotal = item.boxQuantity > 0
         ? item.boxQuantity * parseFloat(item.quantidades[2].valorCaixa)
         : 0;
-  
+
       return total + unQuantityTotal + boxQuantityTotal;
-    }, 0).toFixed(2); 
+    }, 0).toFixed(2);
   };
 
-  
+  const TypingIndicator = () => (
+    <div className="flex justify-start items-center space-x-2">
+      <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce"></div>
+      <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce200"></div>
+      <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce"></div>
+    </div>
+  );
+
 
   return (
     <>
-      <div className='flex flex-row justify-between mt-20'>
-        <div className="flex-row justify-between bg-gradient-to-b from-gray-200 ml-9">
-          <div className="bg-white p-5 w-[60em] h-[41em] rounded-t-lg shadow-lg">
-            <div className="flex flex-row-reverse justify-between mb-10">
-              <div>
-                <h1 className="text-3xl font-semibold text-center text-slate-800">
-                  Atendente virtual
-                </h1>
-              </div>
-              <div className="w-40">
-                <img src={logo} alt="HVS" />
-              </div>
-            </div>
-            {/* Chat History */}
-            <div className="bg-gradient-to-b from-gray-100 border-x-[0.4px] border-zinc-300 shadow-sm p-4 h-[28em] rounded-t-lg overflow-y-auto">
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`mb-4 ${msg.sender === "bot" ? "text-left" : "text-right"}`}
-                >
-                  <div
-                    className={`inline-block p-1.5 rounded-lg max-w-[54em] break-words ${msg.sender === "bot" ? "bg-white text-red-400 border-[0.4px] border-zinc-200" : "bg-gray-200 text-blue-600 border-[0.4px] border-zinc-200"}`}
-                  >
-                    {msg.text}
-                  </div>
-                  <div className="flex mt-1">
-                    {msg.sender === "user" ? null : (
-                      <button
-                        onClick={() => copyMessage(msg.text)}
-                        className="bg text-sm font-thin"
-                      >
-                        Enviar para WhatsApp da loja
-                      </button>
-                    )}
-                  </div>
+      <div className="flex h-full">
+        {/* Chat Section */}
+        <div className="flex-1 p-8 flex flex-col bg-white">
+          {/* Chat History */}
+          <div className="flex-1 p-3 overflow-auto space-y-2">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`text-${msg.sender === "user" ? "right" : "left"} mb-4`}
+              >
+                <div className="inline-block p-2 rounded-lg bg-gray-200">
+                  {msg.text}
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-            {/* Input Field and Send Button */}
-            <div className='p-3 bg-slate-50 border-x-[0.4px] border-b-[0.4px] border-zinc-300'>
-              <div className="flex justify-around">
-                <input
-                  type="text"
-                  className="w-full px-3 mr-2 bg-gray-50 shadow-md border-[0.4px] border-zinc-300 text-black rounded-3xl focus:outline-none focus:ring-1 focus:ring-red-400"
-                  placeholder="Digite sua mensagem..."
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      sendMessage();
-                    }
-                  }}
-                />
-                <button onClick={sendMessage}>
-                  <div className="bg-slate-400 self-center px-4 py-2.5 text-center text-white text-md rounded-xl shadow-sm hover:bg-red-500">
-                    Enviar
-                  </div>
-                </button>
               </div>
+            ))}
+          </div>
+
+          <div className="pt-4 bg-white border-t border-gray-200">
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    sendMessage();
+                  }
+                }}
+                className="w-full px-4 py-4 pr-12 border rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+                placeholder="Digite sua mensagem..."
+              />
+
+              {/* Button inside the input box */}
+              <button
+                onClick={sendMessage}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-500 text-white py-2.5 px-4 rounded-lg shadow-md hover:bg-red-600 transition duration-300"
+              >
+                Enviar
+              </button>
             </div>
           </div>
+
         </div>
-        <Cart
-          handleFinalizePurchase={null}
-          cart={cart}
-          calculateTotal={calculateTotal}
-        />
+
+        {/* Cart Section */}
+        {isCartOpen ?
+          (
+            <>
+
+              <div className="w-[25rem] h-full shadow-xl bg-zinc-100 border-l-[0.8px] border-slate-100 overflow-y-auto">
+              <Cart
+                handleFinalizePurchase={null}
+                cart={cart}
+                calculateTotal={calculateTotal}
+                isOpen={isCartOpen}
+                toggleCart={toggleCartShow}
+              />
+                  </div>
+            </>
+          ) : <ShowCartPopup 
+          toggleCart={toggleCartShow}
+          />
+        }
+
       </div>
+
+
+
+
+
+      {/* Modal */}
       <Modal
         isOpen={isModalOpen}
         selectedProduct={selectedProduct}
@@ -318,9 +338,9 @@ function Chatbox() {
         handleAddToCart={handleAddToCart}
         handleCloseModal={handleCloseModal}
       />
-     
     </>
   );
+
 }
 
 export default Chatbox;

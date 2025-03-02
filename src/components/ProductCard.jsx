@@ -3,19 +3,14 @@ import React from "react";
 const ProductCard = ({ product, handleProductClick, handleProductInfoClick }) => {
   return (
     <div>
-
+    <div  onClick={() => handleProductInfoClick(product)}>
+      <div>Obter informacoes</div>
+    </div>
       <div
         key={product._id}
         onClick={() => handleProductClick(product)}
-        className="cursor-pointer z-10 bg-gradient-to-t from-slate-100 from-10% via-slatge-50 via-30% to-gray-50 to-90% border border-gray-200 rounded-lg pt-0 p-2 pb-3 shadow-md flex flex-col justify-between max-w-xl m-1.5 transition-transform transform hover:scale-105"
+        className="cursor-pointer bg-gradient-to-t from-slate-100 from-10% via-slatge-50 via-30% to-gray-50 to-90% border border-gray-200 rounded-lg p-2 pb-3 shadow-md flex flex-col justify-between max-w-xl m-1.5 transition-transform transform hover:scale-105"
       >
-        <div className="z-30 rounded-lg self-end bg-zinc-200 hover:bg-zinc-300 max-w-fit" onClick={() => handleProductInfoClick(product)}>
-          <div >
-            <div className="bg-white">
-              <div className="text-sm font-extralight">Buscar</div>
-            </div>
-          </div>
-        </div>
         <div className="flex flex-row">
           <div className="w-24 mr-1.5">
             <img width={210} height={210} src="https://images.tcdn.com.br/img/img_prod/964420/agulha_25x6_hipodermica_23g_medix_1857_1_75e5f81e7317bb2b940a190cc7eb2a17.png" alt="" />
@@ -48,6 +43,7 @@ const ProductCard = ({ product, handleProductClick, handleProductInfoClick }) =>
           </div>
         </div>
       </div>
+
     </div>
   );
 };

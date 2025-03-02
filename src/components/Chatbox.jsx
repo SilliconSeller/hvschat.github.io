@@ -1,14 +1,31 @@
 import React, { useEffect, useRef, useState } from "react";
-import logo from '../assets/logohvs.webp';
+import ProductHandler from "../models/productHandler";
+import ProductCard from './ProductCard';
+import Modal from './Modal'
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import Cart, { ShowCartPopup } from './Cart'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
+import ProductInfo from './ProductInfo';
 
 function Chatbox() {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [messageToWpp, setMessageToWpp] = useState("");
-  const [cart, setCart] = useState([]); // State to store the cart items
-  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal visibility
-  const [selectedProduct, setSelectedProduct] = useState(null); // Track selected product
-  const [quantity, setQuantity] = useState(1); // Track quantity selection
+  const [cart, setCart] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [unQuantity, setUnQuantity] = useState(0);
+  const [boxQuantity, setBoxQuantity] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isProductInfoOpen, setProductInfoOpen] = useState(false);
+  const [selectedProductInfo, setSelectedProductInfo] = useState(null);
+
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const toggleCartShow = () => {
+    setIsCartOpen(prevState => !prevState); // Alterna entre true e false
+  };
 
   const handleFinalizePurchase = () => {
     // Construct the message to send to WhatsApp
@@ -45,6 +62,7 @@ function Chatbox() {
     setSelectedProduct(product);
     setIsModalOpen(true); // Open modal to select quantity
   };
+
 
   const handleProductInfoClick = (product) => {
     setSelectedProductInfo(product);
@@ -138,18 +156,11 @@ function Chatbox() {
 
       const data = await response.json();
       if (response.ok) {
-        const products = data.data.products;
+        const handler = new ProductHandler(data);
+        const result = await handler.getProductsAndMessage();
+        const products = await result.products;
+        const gptResponseMessageToUser = await result.gptResponseMessageToUser;
 
-        const gptResponse = data.data.gptResponse.mensagem || data.data.gptResponse.message || data.data.gptResponse.resposta
-
-        const responseToNotFound = (
-          <div>
-            <pre>{gptResponse}</pre>
-          </div>
-        );
-
-
-        // Check if the products array is empty
         if (products.length === 0) {
           // If no products found, send a message
           setMessages([
@@ -204,52 +215,40 @@ function Chatbox() {
     </div>
   );
 
+  function guigo() {
+
+    setProductInfoOpen(true)
+    return(
+
+      console.log('func guigooo')
+    )
+  }
+
+  const handleUnQuantityChange = () => {
+    console.log('aaa')
+  }
   return (
     <>
-      <div className='flex flex-row justify-between mt-28'>
-        {/* Chat UI and messages (unchanged) */}
-        <div className="flex-row justify-between bg-gradient-to-b from-gray-200 ml-9">
-          <div className="bg-white p-5 w-[60em] h-[33em] rounded-lg shadow-lg">
-            <div className="flex flex-row-reverse justify-between mb-10">
-              <div>
-                <h1 className="text-3xl font-bold text-center text-red-400">
-                  Atendente virtual
-                </h1>
-              </div>
-              <div className="w-40">
-                <img src={logo} alt="HVS" />
-              </div>
-            </div>
-
-            {/* Chat History */}
-            <div className="bg-gradient-to-b from-gray-100 border-[0.4px] border-zinc-300 shadow-sm p-4 h-[20em] rounded-lg overflow-y-auto mb-5">
-              {messages.map((msg, index) => (
+      <div className="flex h-full">
+        {/* Chat Section */}
+        <div className="flex-1 p-8 flex flex-col bg-white">
+          {/* Chat History */}
+          <div className="flex-1 mt-4 p-3 overflow-auto space-y-2">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`mb-4 ${msg.sender === "user" ? "text-right" : "text-left"}`}
+              >
                 <div
-                  key={index}
-                  className={`mb-4 ${msg.sender === "bot" ? "text-left" : "text-right"}`}
+                  className={`inline-block p-2 rounded-lg ${msg.sender === "user" ? "bg-zinc-200 text-black" : "bg-zinc-50"}`}
                 >
-                  <div
-                    className={`inline-block p-2 rounded-lg ${msg.sender === "bot" ? "bg-white text-red-400 border-[0.4px] border-zinc-200" : "bg-gray-200 text-blue-500 border-[0.4px] border-zinc-200"}`}
-                  >
-                    {msg.text}
-                  </div>
-                  <div className="flex mt-1">
-                    {msg.sender === "user" ? null : (
-                      <button
-                        onClick={() => copyMessage(msg.text)}
-                        className="bg text-sm font-thin"
-                      >
-                        Enviar para WhatsApp da loja
-                      </button>
-                    )}
-                  </div>
+                  {msg.text}
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Field and Send Button */}
-            <div className="flex justify-around mt-5">
+              </div>
+            ))}
+          </div>
+          <div className="pt-4 bg-white border-t border-gray-200">
+            <div className="relative flex items-center">
               <input
                 type="text"
                 className="w-full px-3 py-3.5 bg-gray-50 shadow-md border-[0.4px] border-zinc-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400"
@@ -270,74 +269,32 @@ function Chatbox() {
             </div>
           </div>
         </div>
-
-        {/* Shopping Cart (fixed on the right side) */}
-        <div
-          className=" bg-white p-3 rounded-lg shadow-lg w-96 h-[420px] overflow-y-auto mr-9"
-          style={{ zIndex: 100 }}
-        >
-          <h3 className="text-xl font-semibold text-red-400 mb-4">Carrinho de compras</h3>
-          <ul className="space-y-2">
-            {cart.map((product, index) => (
-              <li key={index} className="flex justify-between items-center border-b pb-2">
-                <span className="text-sm">{product.nome} (x{product.quantity})</span>
-                <span className="text-sm text-gray-600">R$ {product.preco}</span>
-              </li>
-            ))}
-          </ul>
-          {cart.length === 0 && (
-            <p className="text-sm text-gray-500 mt-4">Seu carrinho está vazio.</p>
-          )}
-          {/* Display Total */}
-          {cart.length > 0 && (
-            <div className="mt-4">
-              <p className="text-lg font-semibold">
-                Total: R$ {calculateTotal()}
-              </p>
-            </div>
-          )}
-          <div className="mt-4 flex">
-            <button 
-                onClick={handleFinalizePurchase}
-                className="bg-red-400 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-500">
-              Finalizar Compra
-            </button>
-          </div>
-        </div>
+        {/* Cart Section */}
+        {isCartOpen ?
+          (
+            <>
+              <div className="w-[25rem] h-full shadow-xl bg-zinc-100 border-l-[0.8px] border-slate-100 overflow-y-auto">
+                <Cart
+                  handleFinalizePurchase={null}
+                  cart={cart}
+                  calculateTotal={calculateTotal}
+                  isOpen={isCartOpen}
+                  toggleCart={toggleCartShow}
+                />
+              </div>
+            </>
+          ) : <ShowCartPopup
+            toggleCart={toggleCartShow}
+          />
+        }
       </div>
 
-      {/* Modal for selecting quantity */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h3 className="text-xl text-red-400 mb-4">Escolha a quantidade</h3>
-            <div>{selectedProduct.nome}</div>
-            <div className="flex justify-between items-center mb-4">
-              <button onClick={() => handleQuantityChange('decrease')} className="px-4 py-2 bg-red-400 text-white rounded-lg">-</button>
-              <input 
-                type="number" 
-                value={quantity} 
-                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)} 
-                min="1"
-                className="w-12 text-center"
-              />
-              <button onClick={() => handleQuantityChange('increase')} className="px-4 py-2 bg-red-400 text-white rounded-lg">+</button>
-            </div>
-            <button 
-              onClick={handleAddToCart} 
-              className="w-full px-4 py-2 bg-red-400 text-white rounded-lg shadow-md hover:bg-red-500"
-            >
-              Adicionar ao carrinho
-            </button>
-            <button 
-              onClick={handleCloseModal} 
-              className="w-full mt-2 px-4 py-2 bg-gray-400 text-white rounded-lg"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
+      <ProductInfo
+        isOpen={isProductInfoOpen}
+        selectedProductInfo={selectedProductInfo}
+        closeModal={() => setProductInfoOpen(false)}
+      />
+     
     </>
   );
 }

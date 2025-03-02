@@ -1,12 +1,14 @@
-import logo from '../assets/logohvs.webp';
 import React, { useEffect, useRef, useState } from "react";
-import ProdutoHandler from '../models/produtoHandler';
+import ProductHandler from "../models/productHandler";
 import ProductCard from './ProductCard';
 import Modal from './Modal'
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Cart, { ShowCartPopup } from './Cart'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
+import ProductInfo from './ProductInfo';
+
+
 
 function Chatbox() {
   const [messages, setMessages] = useState([]);
@@ -18,37 +20,15 @@ function Chatbox() {
   const [unQuantity, setUnQuantity] = useState(0);
   const [boxQuantity, setBoxQuantity] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isProductInfoOpen, setProductInfoOpen] = useState(false);
+  const [selectedProductInfo, setSelectedProductInfo] = useState(null);
+
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-
-  {/* const productTest = [
-    {
-      nome: "SERINGA 20G MEDIX L LOCK",
-      unQuantity: 3,
-      boxQuantity: 2,
-      quantidades: [
-        { valorUn: "10.99" },
-        {},
-        { valorCaixa: "25.50" }
-      ]
-    },
-    {
-      nome: "AGULHA 20G MEDIX L LOCK TEST TEST TEST",
-      unQuantity: 1,
-      boxQuantity: 0,
-      quantidades: [
-        { valorUn: "5.75" },
-        {},
-        { valorCaixa: "18.00" }
-      ]
-    }
-  ];
-  */}
   const toggleCartShow = () => {
     setIsCartOpen(prevState => !prevState); // Alterna entre true e false
   };
-  
+
   const handleFinalizePurchase = () => {
     const cartMessage = cart.map((product) => {
       return `${product.nome} (x${product.quantity}) - R$ ${product.preco}`;
@@ -81,6 +61,11 @@ function Chatbox() {
   const handleProductClick = (product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
+  };
+
+  const handleProductInfoClick = (product) => {
+    setSelectedProductInfo(product);
+    setProductInfoOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -182,7 +167,7 @@ function Chatbox() {
 
       const data = await response.json();
       if (response.ok) {
-        const handler = new ProdutoHandler(data);
+        const handler = new ProductHandler(data);
         const result = await handler.getProductsAndMessage();
         const products = await result.products;
         const gptResponseMessageToUser = await result.gptResponseMessageToUser;
@@ -195,7 +180,7 @@ function Chatbox() {
           ]);
         } else {
           const formattedProducts = products.map((product) => (
-            <ProductCard key={product._id} product={product} handleProductClick={handleProductClick} />
+            <ProductCard key={product._id} product={product} handleProductInfoClick={handleProductInfoClick} handleProductClick={handleProductClick} />
           ));
           setIsLoading(false); // Hide the loading spinner
           setMessages([
@@ -252,6 +237,14 @@ function Chatbox() {
     </div>
   );
 
+  function guigo() {
+
+    setProductInfoOpen(true)
+    return(
+
+      console.log('func guigooo')
+    )
+  }
 
   return (
     <>
@@ -259,19 +252,20 @@ function Chatbox() {
         {/* Chat Section */}
         <div className="flex-1 p-8 flex flex-col bg-white">
           {/* Chat History */}
-          <div className="flex-1 p-3 overflow-auto space-y-2">
+          <div className="flex-1 mt-4 p-3 overflow-auto space-y-2">
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`text-${msg.sender === "user" ? "right" : "left"} mb-4`}
+                className={`mb-4 ${msg.sender === "user" ? "text-right" : "text-left"}`}
               >
-                <div className="inline-block p-2 rounded-lg bg-gray-200">
+                <div
+                  className={`inline-block p-2 rounded-lg ${msg.sender === "user" ? "bg-zinc-200 text-black" : "bg-zinc-50"}`}
+                >
                   {msg.text}
                 </div>
               </div>
             ))}
           </div>
-
           <div className="pt-4 bg-white border-t border-gray-200">
             <div className="relative flex items-center">
               <input
@@ -296,36 +290,32 @@ function Chatbox() {
               </button>
             </div>
           </div>
-
         </div>
-
         {/* Cart Section */}
         {isCartOpen ?
           (
             <>
-
               <div className="w-[25rem] h-full shadow-xl bg-zinc-100 border-l-[0.8px] border-slate-100 overflow-y-auto">
-              <Cart
-                handleFinalizePurchase={null}
-                cart={cart}
-                calculateTotal={calculateTotal}
-                isOpen={isCartOpen}
-                toggleCart={toggleCartShow}
-              />
-                  </div>
+                <Cart
+                  handleFinalizePurchase={null}
+                  cart={cart}
+                  calculateTotal={calculateTotal}
+                  isOpen={isCartOpen}
+                  toggleCart={toggleCartShow}
+                />
+              </div>
             </>
-          ) : <ShowCartPopup 
-          toggleCart={toggleCartShow}
+          ) : <ShowCartPopup
+            toggleCart={toggleCartShow}
           />
         }
-
       </div>
 
-
-
-
-
-      {/* Modal */}
+      <ProductInfo
+        isOpen={isProductInfoOpen}
+        selectedProductInfo={selectedProductInfo}
+        closeModal={() => setProductInfoOpen(false)}
+      />
       <Modal
         isOpen={isModalOpen}
         selectedProduct={selectedProduct}

@@ -6,9 +6,9 @@ export const ShowCartPopup = ({toggleCart}) => {
     
     <button
     onClick={toggleCart}
-    className="fixed top-24 right-5 bg-red-400 text-white p-3.5 rounded-full shadow-md hover:bg-red-700 transition-all"
+    className="fixed top-16 right-0 bg-zinc-200 text-white p-3 rounded-bl-3xl shadow-md hover:bg-gray-200 transition-all"
   >
-    <span className="text-2xl">🛒</span>
+    <span className="text-mg">🛒</span>
   </button>
   )
 }

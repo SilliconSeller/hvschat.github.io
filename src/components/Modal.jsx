@@ -16,7 +16,7 @@ const Modal = ({
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-[24rem] h-[34rem]">
         <h3 className="text-lg font-bold text-slate-950 mb-4">Escolha a quantidade</h3>
         <div className='mb-5 semibold'>{selectedProduct.nome}</div>
         <div className='text-sm font-light mb-1.5'>Quantidades:</div>

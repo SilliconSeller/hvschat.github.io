@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import Chatbox from "./components/Chatbox";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MultiChatbox from "./components/MultiChatbox";
+<<<<<<< HEAD
 import Teste from "./components/Teste";
 
+=======
+//import About from "./pages/About";
+>>>>>>> b42c825 (add-MultiChatbox)
 
 //import About from "./pages/About";
 
 function App() {
-
   return (
     <Router>
       <div className="flex h-screen">
@@ -26,7 +29,10 @@ function App() {
               <Routes>
                 <Route path="/" element={<Chatbox />} />
               <Route path="/pedidos" element={<MultiChatbox />} />  
+<<<<<<< HEAD
               <Route path="/teste" element={<Teste />} />  
+=======
+>>>>>>> b42c825 (add-MultiChatbox)
               </Routes>
             </div>
           </div>

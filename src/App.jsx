@@ -1,10 +1,21 @@
 import React, { useState } from "react";
 import Chatbox from "./components/Chatbox";
 import Header from "./components/Header";
+<<<<<<< Updated upstream
+=======
+import Sidebar from "./components/Sidebar";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import MultiChatbox from "./components/MultiChatbox";
+import Teste from "./components/Teste";
+import Generator from "./components/Generator";
+
+//import About from "./pages/About";
+>>>>>>> Stashed changes
 
 function App() {
 
   return (
+<<<<<<< Updated upstream
   <>
   <div className="min-h-screen bg-gray-50">
   <Header />
@@ -12,6 +23,29 @@ function App() {
   </div>
  
   </>
+=======
+    <Router>
+      <div className="flex h-screen">
+        {/* Sidebar remains persistent */}
+        <Sidebar className="w-64 bg-gray-800 text-white" />
+
+        <div className="flex-1 flex flex-col">
+          {/* Header remains persistent */}
+          <Header className="bg-blue-500 text-white" />
+
+          <div className="flex-1 overflow-y-auto flex flex-col">
+            <div className="flex-1 overflow-auto">
+              <Routes>
+                <Route path="/" element={<Chatbox />} />
+              <Route path="/pedidos" element={<MultiChatbox />} />  
+              <Route path="/teste" element={<Generator />} />  
+              </Routes>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Router>
+>>>>>>> Stashed changes
   );
 }
 

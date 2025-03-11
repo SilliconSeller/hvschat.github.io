@@ -198,6 +198,17 @@ function Chatbox() {
     return cart.reduce((total, product) => total + parseFloat(product.preco), 0).toFixed(2);
   };
 
+<<<<<<< Updated upstream
+=======
+  const TypingIndicator = () => (
+    <div className="flex justify-start items-center space-x-2">
+      <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce"></div>
+      <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce200"></div>
+      <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-bounce"></div>
+    </div>
+  );
+
+>>>>>>> Stashed changes
   return (
     <>
       <div className='flex flex-row justify-between mt-28'>

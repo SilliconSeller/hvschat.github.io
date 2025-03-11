@@ -16,6 +16,11 @@
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+<<<<<<< Updated upstream
+=======
+    "axios": "^1.7.9",
+    "html2canvas": "^1.4.1",
+>>>>>>> Stashed changes
     "openai": "^4.78.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

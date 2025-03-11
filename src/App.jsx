@@ -38,7 +38,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Chatbox />} />
               <Route path="/pedidos" element={<MultiChatbox />} />  
-              <Route path="/teste" element={<Generator />} />  
+              <Route path="/teste" element={<Teste />} />  
               </Routes>
             </div>
           </div>

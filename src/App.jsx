@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import Chatbox from "./components/Chatbox";
 import Header from "./components/Header";
-<<<<<<< Updated upstream
-=======
 import Sidebar from "./components/Sidebar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MultiChatbox from "./components/MultiChatbox";
@@ -10,20 +8,10 @@ import Teste from "./components/Teste";
 import Generator from "./components/Generator";
 
 //import About from "./pages/About";
->>>>>>> Stashed changes
 
 function App() {
 
   return (
-<<<<<<< Updated upstream
-  <>
-  <div className="min-h-screen bg-gray-50">
-  <Header />
-  <Chatbox />
-  </div>
- 
-  </>
-=======
     <Router>
       <div className="flex h-screen">
         {/* Sidebar remains persistent */}
@@ -45,7 +33,6 @@ function App() {
         </div>
       </div>
     </Router>
->>>>>>> Stashed changes
   );
 }
 

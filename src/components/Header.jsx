@@ -13,7 +13,6 @@ const Header = () => {
                 <button>
                     <div className="flex px-4 py-1.5 border-[0.8px] border-zinc-400 flex-row-reverse space-x-reverse space-x-3 items-center rounded-full bg-gray-100 hover:transform-gpu transition-all duration-200 hover:translate-x-3 hover:text-white hover:bg-zinc-700">
                         <FontAwesomeIcon icon={faArrowRightLong} width={24} height={24} />
-                    
                         <div className="text font-light">
                             Ir para o site
                         </div>

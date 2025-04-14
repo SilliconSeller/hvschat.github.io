@@ -5,7 +5,7 @@ import Sidebar from "./components/Sidebar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MultiChatbox from "./components/MultiChatbox";
 import Teste from "./components/Teste";
-import Generator from "./components/Generator";
+
 
 //import About from "./pages/About";
 

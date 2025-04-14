@@ -48,7 +48,6 @@ const ProductCard = ({ product, handleProductClick, handleProductInfoClick }) =>
           </div>
         </div>
       </div>
-
     </div>
   );
 };

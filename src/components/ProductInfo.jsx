@@ -1,26 +1,18 @@
 import { useState } from 'react';
 import React from 'react';
-<<<<<<< HEAD
 import Modal from './Modal'
 import Cart from './Cart';
 
 const ProductInfo = ({ isOpen, selectedProductInfo, closeModal }) => {
-=======
-
-const ProductInfo = ({ isOpen, selectedProductInfo }) => {
->>>>>>> b42c825 (add-MultiChatbox)
   if (!isOpen) return null; // Não renderizar se o modal não estiver aberto
 
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-<<<<<<< HEAD
   const [cart, setCart] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [unQuantity, setUnQuantity] = useState(0);
   const [boxQuantity, setBoxQuantity] = useState(0);
-=======
->>>>>>> b42c825 (add-MultiChatbox)
 
   const sendMessage = async () => {
     if (userInput.trim() === "") return;
@@ -72,7 +64,6 @@ const ProductInfo = ({ isOpen, selectedProductInfo }) => {
     }
   };
 
-<<<<<<< HEAD
   const toggleCartShow = () => {
     setIsCartOpen(prevState => !prevState); // Alterna entre true e false
   };
@@ -228,62 +219,12 @@ const ProductInfo = ({ isOpen, selectedProductInfo }) => {
             </div>
           </div>
           {/*
-=======
-  return (
-    <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-4 rounded-lg shadow-lg w-[44rem] h-[40rem]">
-        <h1> {selectedProductInfo.nome} </h1>
-        <h3 className='text-sm font-light mb-1.5'>{selectedProductInfo._id}:</h3>
-        <div className="flex-1 p-8 flex flex-col bg-white">
-          {/* Histórico de mensagens */}
-          <div className="flex-1 mt-60 p-3 overflow-auto space-y-2">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`mb-4 ${msg.sender === "user" ? "text-right" : "text-left"}`}
-              >
-                <div
-                  className={`inline-block p-2 rounded-lg ${msg.sender === "user" ? "bg-zinc-200 text-black" : "bg-zinc-50"}`}
-                >
-                  {msg.text}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Input de mensagens */}
-          <div className="pt-3 bg-white border-t border-gray-200">
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    sendMessage();
-                  }
-                }}
-                className="w-full px-4 py-2.5 pr-12 border rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-red-300"
-                placeholder="Digite sua mensagem..."
-              />
-              <button
-                onClick={sendMessage}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-500 text-white py-1.5 px-4 rounded-lg shadow-md hover:bg-red-600 transition duration-300"
-              >
-                Enviar
-              </button>
-            </div>
-          </div>
-        </div>
-{/*
->>>>>>> b42c825 (add-MultiChatbox)
   <button
           onClick={null} // Coloque a função para o carrinho aqui
           className="w-full px-4 py-2 bg-red-400 text-white rounded-lg shadow-md hover:bg-red-500"
         >
           Adicionar ao carrinho
         </button>
-<<<<<<< HEAD
 */}
         </div>
       </div>
@@ -307,11 +248,6 @@ const ProductInfo = ({ isOpen, selectedProductInfo }) => {
         toggleCart={toggleCartShow}
       />
     </>
-=======
-*/} 
-      </div>
-    </div>
->>>>>>> b42c825 (add-MultiChatbox)
   );
 };
 

@@ -46,11 +46,7 @@ const Sidebar = () => {
             </a>
           </li>
           <li className="text-center font-semibold">
-<<<<<<< HEAD
             <a href="/teste" className={`block py-2  text-start ${!isOpen && 'text-center'} hover:bg-gray-200 rounded-md`}>
-=======
-            <a href="/contact" className={`block py-2  text-start ${!isOpen && 'text-center'} hover:bg-gray-200 rounded-md`}>
->>>>>>> b42c825 (add-MultiChatbox)
               {isOpen ? 'Perfil' : <FontAwesomeIcon size='lg' icon={faCircleUser} />}
             </a>
           </li>

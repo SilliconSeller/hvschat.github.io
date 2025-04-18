@@ -27,7 +27,7 @@ const ProductInfo = ({ isOpen, selectedProductInfo, closeModal }) => {
       const searchProductRefId = encodeURIComponent(selectedProductInfo._id);
       console.log('oi', searchProductRefId)
       const response = await fetch(
-        `http://localhost:5008/productInfo?search=${apiSearchProductInfoMessages}&refId=${searchProductRefId}`,
+        `${import.meta.env.VITE_API_URL}http://localhost:5008/productInfo?search=${apiSearchProductInfoMessages}&refId=${searchProductRefId}`,
         {
           method: 'GET',
           headers: {

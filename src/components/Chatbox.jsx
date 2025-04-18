@@ -183,7 +183,7 @@ function Chatbox() {
     try {
       const apiMessagesString = encodeURIComponent(userInput.toLocaleLowerCase());
 
-      const response = await fetch(`http://localhost:5008/product?search=${apiMessagesString}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/product?search=${apiMessagesString}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

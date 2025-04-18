@@ -158,7 +158,7 @@ const MultiChatbox = () => {
       try {
         const apiMultiProdcutsMessagesString = encodeURIComponent(userInput.toLocaleLowerCase());
   
-        const response = await fetch(`http://localhost:5008/productMulti?search=${apiMultiProdcutsMessagesString}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}http://localhost:5008/productMulti?search=${apiMultiProdcutsMessagesString}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'

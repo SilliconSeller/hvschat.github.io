@@ -12,19 +12,15 @@ function App() {
   return (
     <Router>
       <div className="flex h-screen">
-        {/* Sidebar remains persistent */}
         <Sidebar className="w-64 bg-gray-800 text-white" />
-
         <div className="flex-1 flex flex-col">
-          {/* Header remains persistent */}
           <Header className="bg-blue-500 text-white" />
-
           <div className="flex-1 overflow-y-auto flex flex-col">
             <div className="flex-1 overflow-auto">
               <Routes>
                 <Route path="/" element={<Chatbox />} />
-              <Route path="/pedidos" element={<MultiChatbox />} />  
-              <Route path="/Teste" element={<Teste />} />  
+                <Route path="/pedidos" element={<MultiChatbox />} />
+                <Route path="/Teste" element={<Teste />} />
               </Routes>
             </div>
           </div>

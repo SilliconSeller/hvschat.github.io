@@ -1,19 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-<<<<<<< HEAD
 import ProductHandler from "../models/productHandler";
-=======
-import ProdutoHandler from '../models/produtoHandler';
->>>>>>> refs/remotes/origin/main
 import ProductCard from './ProductCard';
 import Modal from './Modal'
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Cart, { ShowCartPopup } from './Cart'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
-<<<<<<< HEAD
 import ProductInfo from './ProductInfo';
-=======
->>>>>>> refs/remotes/origin/main
 
 function Chatbox() {
   const [messages, setMessages] = useState([]);
@@ -25,7 +18,6 @@ function Chatbox() {
   const [unQuantity, setUnQuantity] = useState(0);
   const [boxQuantity, setBoxQuantity] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-<<<<<<< HEAD
   const [isProductInfoOpen, setProductInfoOpen] = useState(false);
   const [selectedProductInfo, setSelectedProductInfo] = useState(null);
 
@@ -34,10 +26,6 @@ function Chatbox() {
   const toggleCartShow = () => {
     setIsCartOpen(prevState => !prevState); // Alterna entre true e false
   };
-=======
-  const [isOpen, setIsOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
->>>>>>> refs/remotes/origin/main
 
 
   {/* const productTest = [
@@ -63,9 +51,7 @@ function Chatbox() {
     }
   ];
   */}
-  const toggleCartShow = () => {
-    setIsCartOpen(prevState => !prevState); // Alterna entre true e false
-  };
+
   
   const handleFinalizePurchase = () => {
     const cartMessage = cart.map((product) => {
@@ -206,11 +192,7 @@ function Chatbox() {
 
       const data = await response.json();
       if (response.ok) {
-<<<<<<< HEAD
         const handler = new ProductHandler(data);
-=======
-        const handler = new ProdutoHandler(data);
->>>>>>> refs/remotes/origin/main
         const result = await handler.getProductsAndMessage();
         const products = await result.products;
         const gptResponseMessageToUser = await result.gptResponseMessageToUser;
@@ -223,11 +205,7 @@ function Chatbox() {
           ]);
         } else {
           const formattedProducts = products.map((product) => (
-<<<<<<< HEAD
             <ProductCard key={product._id} product={product} handleProductInfoClick={handleProductInfoClick} handleProductClick={handleProductClick} />
-=======
-            <ProductCard key={product._id} product={product} handleProductClick={handleProductClick} />
->>>>>>> refs/remotes/origin/main
           ));
           setIsLoading(false); // Hide the loading spinner
           setMessages([
@@ -284,7 +262,6 @@ function Chatbox() {
     </div>
   );
 
-<<<<<<< HEAD
   function guigo() {
 
     setProductInfoOpen(true)
@@ -294,19 +271,12 @@ function Chatbox() {
     )
   }
 
-  const handleUnQuantityChange = () => {
-    console.log('aaa')
-  }
-=======
-
->>>>>>> refs/remotes/origin/main
   return (
     <>
       <div className="flex h-full">
         {/* Chat Section */}
         <div className="flex-1 p-8 flex flex-col bg-white">
           {/* Chat History */}
-<<<<<<< HEAD
           <div className="flex-1 mt-4 p-3 overflow-auto space-y-2">
             {messages.map((msg, index) => (
               <div
@@ -316,24 +286,11 @@ function Chatbox() {
                 <div
                   className={`inline-block p-2 rounded-lg ${msg.sender === "user" ? "bg-zinc-200 text-black" : "bg-zinc-50"}`}
                 >
-=======
-          <div className="flex-1 p-3 overflow-auto space-y-2">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`text-${msg.sender === "user" ? "right" : "left"} mb-4`}
-              >
-                <div className="inline-block p-2 rounded-lg bg-gray-200">
->>>>>>> refs/remotes/origin/main
                   {msg.text}
                 </div>
               </div>
             ))}
           </div>
-<<<<<<< HEAD
-=======
-
->>>>>>> refs/remotes/origin/main
           <div className="pt-4 bg-white border-t border-gray-200">
             <div className="relative flex items-center">
               <input
@@ -360,15 +317,10 @@ function Chatbox() {
           </div>
 
         </div>
-<<<<<<< HEAD
-=======
-
->>>>>>> refs/remotes/origin/main
         {/* Cart Section */}
         {isCartOpen ?
           (
             <>
-<<<<<<< HEAD
               <div className="w-[25rem] h-full shadow-xl bg-zinc-100 border-l-[0.8px] border-slate-100 overflow-y-auto">
                 <Cart
                   handleFinalizePurchase={null}
@@ -391,43 +343,6 @@ function Chatbox() {
         closeModal={() => setProductInfoOpen(false)}
       />
      
-=======
-
-              <div className="w-[25rem] h-full shadow-xl bg-zinc-100 border-l-[0.8px] border-slate-100 overflow-y-auto">
-              <Cart
-                handleFinalizePurchase={null}
-                cart={cart}
-                calculateTotal={calculateTotal}
-                isOpen={isCartOpen}
-                toggleCart={toggleCartShow}
-              />
-                  </div>
-            </>
-          ) : <ShowCartPopup 
-          toggleCart={toggleCartShow}
-          />
-        }
-
-      </div>
-
-
-
-
-
-      {/* Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        selectedProduct={selectedProduct}
-        unQuantity={unQuantity}
-        boxQuantity={boxQuantity}
-        handleUnQuantityChange={handleUnQuantityChange}
-        handleBoxQuantityChange={handleBoxQuantityChange}
-        setUnQuantity={setUnQuantity}
-        setBoxQuantity={setBoxQuantity}
-        handleAddToCart={handleAddToCart}
-        handleCloseModal={handleCloseModal}
-      />
->>>>>>> refs/remotes/origin/main
     </>
   );
 

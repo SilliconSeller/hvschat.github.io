@@ -1,29 +1,19 @@
 import React, { useState } from "react";
 import cartSVG from '../assets/cartempty.svg';
-<<<<<<< HEAD
 import Teste from "./Teste";
-=======
->>>>>>> refs/remotes/origin/main
 
 export const ShowCartPopup = ({toggleCart}) => {
   return (
     
     <button
     onClick={toggleCart}
-<<<<<<< HEAD
     className="fixed top-16 right-0 bg-zinc-200 text-white p-3 rounded-bl-3xl shadow-md hover:bg-gray-200 transition-all"
   >
     <span className="text-mg">🛒</span>
-=======
-    className="fixed top-24 right-5 bg-red-400 text-white p-3.5 rounded-full shadow-md hover:bg-red-700 transition-all"
-  >
-    <span className="text-2xl">🛒</span>
->>>>>>> refs/remotes/origin/main
   </button>
   )
 }
 
-<<<<<<< HEAD
 
 const Cart = ({ cart, handleFinalizePurchase, calculateTotal, product , isOpen, toggleCart}) => {
 
@@ -47,10 +37,6 @@ const Cart = ({ cart, handleFinalizePurchase, calculateTotal, product , isOpen, 
 
   }
 
-=======
-const Cart = ({ cart, handleFinalizePurchase, calculateTotal, product , isOpen, toggleCart}) => {
-
->>>>>>> refs/remotes/origin/main
   return (
     <div>
       {/* Button to toggle cart visibility */}
@@ -112,15 +98,12 @@ const Cart = ({ cart, handleFinalizePurchase, calculateTotal, product , isOpen, 
               </button>
             </div>
           )}
-<<<<<<< HEAD
           <div>
             
             <button onClick={generateNote}>
               GERAR
             </button>
           </div>
-=======
->>>>>>> refs/remotes/origin/main
         </div>
       </div>
     </div>
